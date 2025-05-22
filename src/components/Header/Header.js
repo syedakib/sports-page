@@ -5,24 +5,23 @@ import './Header.css';
 
 const Header = ({ userName, handleLogout }) => {
     const [displayName, setDisplayName] = useState(userName);
-    const [toggleOn, setToggleOn] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
         setDisplayName(userName);
     }, [userName]);
 
-    const handleToggle = () => {
-        setToggleOn((prev) => {
-            const newValue = !prev;
-            if (newValue) {
-                document.body.classList.add('dark-theme');
-            } else {
-                document.body.classList.remove('dark-theme');
-            }
-            return newValue;
-        });
-    };
+    // const handleToggle = () => {
+    //     setToggleOn((prev) => {
+    //         const newValue = !prev;
+    //         if (newValue) {
+    //             document.body.classList.add('dark-theme');
+    //         } else {
+    //             document.body.classList.remove('dark-theme');
+    //         }
+    //         return newValue;
+    //     });
+    // };
 
     return (
         <header className="header">
@@ -46,7 +45,7 @@ const Header = ({ userName, handleLogout }) => {
                 )}
             </div>
             <div className="toggle-wrapper">
-                <Toggle checked={toggleOn} onChange={handleToggle} />
+                <Toggle/>
             </div>
 
         </header>

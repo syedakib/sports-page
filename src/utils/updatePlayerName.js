@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import { PlayerContext } from '../PlayerContext';
+import { PlayerContext } from '../components/useContexts/PlayerContext';
 
 const useUpdatePlayerName = (initialPlayers) => {
     const {players, setPlayers} = useContext(PlayerContext);

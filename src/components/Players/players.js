@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { PlayerContext } from '../../PlayerContext';
+import { PlayerContext } from '../useContexts/PlayerContext';
 import useUpdatePlayerName from '../../utils/updatePlayerName'
 import './players.css';
 
