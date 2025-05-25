@@ -1,15 +1,21 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useContext } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { PlayerContext } from '../useContexts/PlayerContext';
 import useUpdatePlayerName from '../../utils/updatePlayerName'
 import './players.css';
 
+const fetchPlayers = async () => {
+    const response = await fetch('https://dummyjson.com/users');
+    if (!response.ok) {
+        throw new Error('Failed to fetch players');
+    }
+    const data = await response.json();
+    return data.users;
+};
+
 const Players = () => {
-    const {players, setPlayers} = useContext(PlayerContext);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const { setPlayers, players } = useContext(PlayerContext);
     const {
-        // players,
-        // setPlayers,        
         editingPlayerId,
         setEditingPlayerId,
         newName,
@@ -17,31 +23,19 @@ const Players = () => {
         updatePlayerName,
     } = useUpdatePlayerName([]);
 
-    useEffect(() => {
-        fetch('https://dummyjson.com/users')
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Failed to fetch players');
-                }
-                return response.json();
-            })
-            .then((data) => {
-                setPlayers(data.users);
-                setLoading(false);
-            })
-            .catch((err) => {
-                setError(err.message);
-                setLoading(false);
-            });
-    }, [setPlayers]);
+    const { data, isLoading, error } = useQuery({
+        queryKey: ['players'],
+        queryFn: fetchPlayers,
+        onSuccess: (users) => setPlayers(users),
+    });
 
     return (
         <div className="players-page">
             <h5>Players</h5>
-            {loading && <p>Loading...</p>}
-            {error && <p>Error: {error}</p>}
+            {isLoading && <p>Loading...</p>}
+            {error && <p>Error: {error.message}</p>}
             <ul className="players-list">
-                {players.map((player) => (
+                {(data || []).map((player) => (
                     <li key={player.id} className="player-item">
                         {editingPlayerId === player.id ? (
                             <div>
