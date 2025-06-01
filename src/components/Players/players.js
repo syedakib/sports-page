@@ -13,6 +13,24 @@ const fetchPlayers = async () => {
     return data.users;
 };
 
+const updatePlayerFn = async ({id, newName}) => {
+    const response = await fetch(`https://dummyjson.com/users/${id}`,{
+        method:  'PUT',
+        headers:{
+            'Content-Type' : 'application/json',
+        },
+        body: JSON.stringify({firstName: newName}),
+    });
+        if (!response.ok) {
+        throw new Error('Failed to fetch players');
+    }
+    const updatedPlayer = await response.json();
+    console.log('Updated', updatedPlayer)
+
+    return {...updatedPlayer, id };
+
+}
+
 const Players = () => {
     const {  players, setPlayers  } = useContext(PlayerContext);
     const {
@@ -21,7 +39,7 @@ const Players = () => {
         newName,
         setNewName,
         updatePlayerName,
-    } = useUpdatePlayerName(players);
+    } = useUpdatePlayerName(updatePlayerFn);
 
     const { data: fetchedPlayers ,
             isLoading,
