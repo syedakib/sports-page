@@ -2,9 +2,21 @@ import React, { useContext, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PlayerContext } from '../useContexts/PlayerContext';
 import useUpdatePlayerName from '../../utils/updatePlayerName'
+import {
+    Box,
+    Typography,
+    List,
+    ListItem,
+    ListItemText,
+    Button,
+    TextField,
+    CircularProgress,
+    Alert,
+    Paper,
+} from '@mui/material';
 import './players.css';
 
-const fetchPlayers = async () => {
+const fetchPlayers = async () => { 
     const response = await fetch('https://dummyjson.com/users');
     if (!response.ok) {
         throw new Error('Failed to fetch players');
@@ -21,14 +33,13 @@ const updatePlayerFn = async ({id, newName}) => {
         },
         body: JSON.stringify({firstName: newName}),
     });
-        if (!response.ok) {
+    if (!response.ok) {
         throw new Error('Failed to fetch players');
     }
     const updatedPlayer = await response.json();
     console.log('Updated', updatedPlayer)
 
     return {...updatedPlayer, id };
-
 }
 
 const Players = () => {
@@ -45,10 +56,9 @@ const Players = () => {
             isLoading,
             isError,
             error
-        } = useQuery({
+        } = useQuery({        
         queryKey: ['players'],
         queryFn: fetchPlayers,
-        // onSuccess: (data) => setPlayers(data),
     });
 
     useEffect(()=> {
@@ -58,38 +68,58 @@ const Players = () => {
     }, [fetchedPlayers, setPlayers])
 
     return (
-        <div className="players-page">
-            <h5>Players</h5>
-            {isLoading && <p>Loading...</p>}
-            {isError && <p>Error: {error.message}</p>}
-            <ul className="players-list">
-                {players.map((player) => (
-                    <li key={player.id} className="player-item">
-                        {editingPlayerId === player.id ? (
-                            <div>
-                                <input
-                                    type="text"
-                                    value={newName}
-                                    onChange={(e) => setNewName(e.target.value)}
-                                    placeholder="Enter new name"
-                                />
-                                <button onClick={() => updatePlayerName(player.id, newName)}>
-                                    Save
-                                </button>
-                                <button onClick={() => setEditingPlayerId(null)}>Cancel</button>
-                            </div>
-                        ) : (
-                            <div>
-                                <h2>{player.firstName}</h2>
-                                <button onClick={() => setEditingPlayerId(player.id)}>
-                                    Update Name
-                                </button>
-                            </div>
-                        )}
-                    </li>
-                ))}
-            </ul>
-        </div>
+        <Box className="players-page" sx={{ maxWidth: 500, mx: 'auto', mt: 4 }}>
+            <Typography variant="h5" gutterBottom>Players</Typography>
+            {isLoading && <CircularProgress />}
+            {isError && <Alert severity="error">{error.message}</Alert>}
+            <Paper elevation={3}>
+                <List>
+                    {players.map((player) => (
+                        <ListItem key={player.id} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                            {editingPlayerId === player.id ? (
+                                <Box sx={{ width: '100%' }}>
+                                    <TextField
+                                        fullWidth
+                                        value={newName}
+                                        onChange={(e) => setNewName(e.target.value)}
+                                        placeholder="Enter new name"
+                                        size="small"
+                                        sx={{ mb: 1 }}
+                                    />
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={() => updatePlayerName(player.id, newName)}
+                                        sx={{ mr: 1 }}
+                                    >
+                                        Save
+                                    </Button>
+                                    <Button
+                                        variant="outlined"
+                                        color="secondary"
+                                        onClick={() => setEditingPlayerId(null)}
+                                    >
+                                        Cancel
+                                    </Button>
+                                </Box>
+                            ) : (
+                                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <ListItemText
+                                        primary={<Typography variant="h6">{player.firstName}</Typography>}
+                                    />
+                                    <Button
+                                        variant="outlined"
+                                        onClick={() => setEditingPlayerId(player.id)}
+                                    >
+                                        Update Name
+                                    </Button>
+                                </Box>
+                            )}
+                        </ListItem>
+                    ))}
+                </List>
+            </Paper>
+        </Box>
     );
 };
 
